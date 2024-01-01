@@ -691,9 +691,9 @@ CSHA256::CSHA256()
     sha256::Initialize(s);
 }
 
-CSHA256& CSHA256::Write(const unsigned char* data, size_t len)
+CSHA256& CSHA256::Write(const unsigned char* data, size_t len) //X- data是被哈希的原始数据，长度为len
 {
-    const unsigned char* end = data + len;
+    const unsigned char* end = data + len; //X- data尾部指针
     size_t bufsize = bytes % 64;
     if (bufsize && bufsize + len >= 64) {
         // Fill the buffer, and process it.
@@ -717,7 +717,7 @@ CSHA256& CSHA256::Write(const unsigned char* data, size_t len)
     return *this;
 }
 
-void CSHA256::Finalize(unsigned char hash[OUTPUT_SIZE])
+void CSHA256::Finalize(unsigned char hash[OUTPUT_SIZE]) //X- 最终的输出结果就是32个字节
 {
     static const unsigned char pad[64] = {0x80};
     unsigned char sizedesc[8];

@@ -109,7 +109,7 @@ static void ReportHardwareRand()
  *
  * Must only be called when RdRand is supported.
  */
-static uint64_t GetRdRand() noexcept
+static uint64_t GetRdRand() noexcept //X-使用汇编指令产生随机数？
 {
     // RdRand may very rarely fail. Invoke it up to 10 times in a loop to reduce this risk.
 #ifdef __i386__
@@ -246,8 +246,8 @@ static void ReportHardwareRand() {}
 static void SeedHardwareFast(CSHA512& hasher) noexcept {
 #if defined(__x86_64__) || defined(__amd64__) || defined(__i386__)
     if (g_rdrand_supported) {
-        uint64_t out = GetRdRand();
-        hasher.Write((const unsigned char*)&out, sizeof(out));
+        uint64_t out = GetRdRand(); //X-得到8字节的随机数
+        hasher.Write((const unsigned char*)&out, sizeof(out)); //X-进行哈希计算
         return;
     }
 #elif defined(__aarch64__) && defined(HWCAP2_RNG)
@@ -506,7 +506,7 @@ RNGState& GetRNGState() noexcept
 
 static void SeedTimestamp(CSHA512& hasher) noexcept
 {
-    int64_t perfcounter = GetPerformanceCounter();
+    int64_t perfcounter = GetPerformanceCounter(); //X- 获得当前时间，继续哈希，变得更加随机
     hasher.Write((const unsigned char*)&perfcounter, sizeof(perfcounter));
 }
 
@@ -516,7 +516,7 @@ static void SeedFast(CSHA512& hasher) noexcept
 
     // Stack pointer to indirectly commit to thread/callstack
     const unsigned char* ptr = buffer;
-    hasher.Write((const unsigned char*)&ptr, sizeof(ptr));
+    hasher.Write((const unsigned char*)&ptr, sizeof(ptr)); //X- 把哈希值写入到临时的缓冲区内
 
     // Hardware randomness is very fast when available; use it always.
     SeedHardwareFast(hasher);
@@ -602,12 +602,12 @@ enum class RNGLevel {
     PERIODIC, //!< Called by RandAddPeriodic()
 };
 
-static void ProcRand(unsigned char* out, int num, RNGLevel level) noexcept //X-产生num个字节的随机数，放在out缓冲区里面
+static void ProcRand(unsigned char* out, int num, RNGLevel level) noexcept //X-产生num个字节的随机数，放在out缓冲区里面，level是不同的层次，快慢之分
 {
     // Make sure the RNG is initialized first (as all Seed* function possibly need hwrand to be available).
     RNGState& rng = GetRNGState();
 
-    assert(num <= 32);
+    assert(num <= 32); //X- 生成的随机数最长长度不超过32个字节
 
     CSHA512 hasher;
     switch (level) {

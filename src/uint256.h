@@ -18,12 +18,12 @@
 
 /** Template base class for fixed-sized opaque blobs. */
 template<unsigned int BITS>
-class base_blob
+class base_blob //X-固定长度的数字
 {
 protected:
-    static constexpr int WIDTH = BITS / 8;
-    static_assert(BITS % 8 == 0, "base_blob currently only supports whole bytes.");
-    std::array<uint8_t, WIDTH> m_data;
+    static constexpr int WIDTH = BITS / 8; //X-把比特换成字节数
+    static_assert(BITS % 8 == 0, "base_blob currently only supports whole bytes."); //X-必须是8的倍数
+    std::array<uint8_t, WIDTH> m_data; //X-这里面保存真正的数据，是固定长度的，在编译时就确定了
     static_assert(WIDTH == sizeof(m_data), "Sanity check");
 
 public:
@@ -36,7 +36,7 @@ public:
     constexpr explicit base_blob(Span<const unsigned char> vch)
     {
         assert(vch.size() == WIDTH);
-        std::copy(vch.begin(), vch.end(), m_data.begin());
+        std::copy(vch.begin(), vch.end(), m_data.begin()); //X- 把vch的值拷贝到对象中来，相当于赋值
     }
 
     constexpr bool IsNull() const
@@ -51,7 +51,7 @@ public:
         std::fill(m_data.begin(), m_data.end(), 0);
     }
 
-    constexpr int Compare(const base_blob& other) const { return std::memcmp(m_data.data(), other.m_data.data(), WIDTH); }
+    constexpr int Compare(const base_blob& other) const { return std::memcmp(m_data.data(), other.m_data.data(), WIDTH); } //使用memcmp来比较两个对象是否相同
 
     friend constexpr bool operator==(const base_blob& a, const base_blob& b) { return a.Compare(b) == 0; }
     friend constexpr bool operator!=(const base_blob& a, const base_blob& b) { return a.Compare(b) != 0; }

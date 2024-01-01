@@ -20,7 +20,7 @@ const unsigned int BIP32_EXTKEY_SIZE = 74;
 const unsigned int BIP32_EXTKEY_WITH_VERSION_SIZE = 78;
 
 /** A reference to a CKey: the Hash160 of its serialized public key */
-class CKeyID : public uint160
+class CKeyID : public uint160 //X- keyid是20个字节
 {
 public:
     CKeyID() : uint160() {}
@@ -36,8 +36,8 @@ public:
     /**
      * secp256k1:
      */
-    static constexpr unsigned int SIZE                   = 65;
-    static constexpr unsigned int COMPRESSED_SIZE        = 33;
+    static constexpr unsigned int SIZE                   = 65; //X-未压缩的公钥是65个字节: 1+32+32
+    static constexpr unsigned int COMPRESSED_SIZE        = 33; //X-压缩后的公钥是33个字节: 1+32 (因为y可以由x推导出来)
     static constexpr unsigned int SIGNATURE_SIZE         = 72;
     static constexpr unsigned int COMPACT_SIGNATURE_SIZE = 65;
     /**
@@ -54,10 +54,10 @@ private:
      * Just store the serialized data.
      * Its length can very cheaply be computed from the first byte.
      */
-    unsigned char vch[SIZE];
+    unsigned char vch[SIZE]; //X-第一个字节可以推知它的长度。vch是保存公钥的缓冲区
 
     //! Compute the length of a pubkey with a given first byte.
-    unsigned int static GetLen(unsigned char chHeader)
+    unsigned int static GetLen(unsigned char chHeader) //X-如果第一个字节是2或者3，就是压缩的公钥，返回值是33，否则就返回65，失败了返回0
     {
         if (chHeader == 2 || chHeader == 3)
             return COMPRESSED_SIZE;
@@ -67,7 +67,7 @@ private:
     }
 
     //! Set this key data to be invalid
-    void Invalidate()
+    void Invalidate() //X-只要把第一个字节写成0xFF即可
     {
         vch[0] = 0xFF;
     }
@@ -75,13 +75,13 @@ private:
 public:
 
     bool static ValidSize(const std::vector<unsigned char> &vch) {
-      return vch.size() > 0 && GetLen(vch[0]) == vch.size();
+      return vch.size() > 0 && GetLen(vch[0]) == vch.size(); // 根据第一个字节能推知公钥的长度
     }
 
     //! Construct an invalid public key.
     CPubKey()
     {
-        Invalidate();
+        Invalidate(); //X-对象创建之初让公钥无效
     }
 
     //! Initialize a public key using begin/end iterators to byte data.
@@ -109,19 +109,19 @@ public:
     }
 
     //! Simple read-only vector-like interface to the pubkey data.
-    unsigned int size() const { return GetLen(vch[0]); }
-    const unsigned char* data() const { return vch; }
-    const unsigned char* begin() const { return vch; }
-    const unsigned char* end() const { return vch + size(); }
-    const unsigned char& operator[](unsigned int pos) const { return vch[pos]; }
+    unsigned int size() const { return GetLen(vch[0]); } //X-获得公钥的长度，只要检查第一个字节即可
+    const unsigned char* data() const { return vch; } //X- vch是保存公钥的缓冲区
+    const unsigned char* begin() const { return vch; } //X-返回头部指针
+    const unsigned char* end() const { return vch + size(); } //X-返回尾部指针
+    const unsigned char& operator[](unsigned int pos) const { return vch[pos]; } //X-返回指定位置的数据
 
     //! Comparator implementation.
-    friend bool operator==(const CPubKey& a, const CPubKey& b)
+    friend bool operator==(const CPubKey& a, const CPubKey& b) //X-判断两个公钥相等
     {
         return a.vch[0] == b.vch[0] &&
                memcmp(a.vch, b.vch, a.size()) == 0;
     }
-    friend bool operator!=(const CPubKey& a, const CPubKey& b)
+    friend bool operator!=(const CPubKey& a, const CPubKey& b) //X-判断两个公钥不等
     {
         return !(a == b);
     }
