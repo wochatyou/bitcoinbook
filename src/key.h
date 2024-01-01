@@ -20,13 +20,13 @@
  * CPrivKey is a serialized private key, with all parameters included
  * (SIZE bytes)
  */
-typedef std::vector<unsigned char, secure_allocator<unsigned char> > CPrivKey;
+typedef std::vector<unsigned char, secure_allocator<unsigned char> > CPrivKey; //X- 
 
 /** Size of ECDH shared secrets. */
-constexpr static size_t ECDH_SECRET_SIZE = CSHA256::OUTPUT_SIZE;
+constexpr static size_t ECDH_SECRET_SIZE = CSHA256::OUTPUT_SIZE; //X- 就是32个字节
 
 // Used to represent ECDH shared secret (ECDH_SECRET_SIZE bytes)
-using ECDHSecret = std::array<std::byte, ECDH_SECRET_SIZE>;
+using ECDHSecret = std::array<std::byte, ECDH_SECRET_SIZE>; //X- 这个数据类型就是32个字节的一个数组
 
 /** An encapsulated private key. */
 class CKey
@@ -35,8 +35,8 @@ public:
     /**
      * secp256k1:
      */
-    static const unsigned int SIZE            = 279;
-    static const unsigned int COMPRESSED_SIZE = 214;
+    static const unsigned int SIZE            = 279;  //X- 没有压缩的长度
+    static const unsigned int COMPRESSED_SIZE = 214;  //X- 压缩过的长度
     /**
      * see www.keylength.com
      * script supports up to 75 for single byte push

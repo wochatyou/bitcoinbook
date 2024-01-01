@@ -243,7 +243,7 @@ bool CKey::VerifyPubKey(const CPubKey& pubkey) const {
     if (pubkey.IsCompressed() != fCompressed) {
         return false;
     }
-    unsigned char rnd[8];
+    unsigned char rnd[8]; //X= 这里的逻辑是产生一个随机数，再哈希，然后签名，然后验证
     std::string str = "Bitcoin key verification\n";
     GetRandBytes(rnd);
     uint256 hash{Hash(str, rnd)};
